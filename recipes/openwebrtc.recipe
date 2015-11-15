@@ -40,9 +40,9 @@ class Recipe(recipe.Recipe):
     stype = SourceType.GIT
     licenses = [License.BSD_like]
     remotes = {
-        'origin': 'https://github.com/EricssonResearch/openwebrtc.git'
+        'origin': 'https://github.com/danielwegener/openwebrtc.git'
     }
-    commit = 'origin/master'
+    commit = 'origin/openwebrtc-java'
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'
     # Dependencies used in the dynamic (shared) build of OWRTC
@@ -78,6 +78,17 @@ class Recipe(recipe.Recipe):
             self.deps += ['seed']
             self.files_libs += ['libopenwebrtc_bridge']
             self.files_devel.insert(self.files_devel.index('include/owr'), 'lib/pkgconfig/openwebrtc-bridge-' + self._api_version + '.pc')
+            self.files_devel += [
+                            'lib/jni/openwebrtc.jar',
+                            'lib/jni/openwebrtc-sources.jar',
+                            'lib/jni/openwebrtc-javadoc.jar'
+                            ]
+            if self.config.variants.owr_bridge:
+                self.files_devel += [
+                    'lib/jni/openwebrtc_bridge.jar',
+                    'lib/jni/openwebrtc_bridge-sources.jar',
+                    'lib/jni/openwebrtc_bridge-javadoc.jar',
+                ]
         else:
             self.configure_options += ' --disable-bridge '
         if self.config.target_platform in (Platform.IOS, Platform.ANDROID):
@@ -152,6 +163,7 @@ class Recipe(recipe.Recipe):
             self.configure_options += ' --enable-gtk-doc --disable-static \
                 --disable-owr-static --enable-shared --enable-tests'
             if self.config.target_platform == Platform.LINUX:
+                self.configure_options += ' --enable-owr-java'
                 # Use system libraries for libpulse, libv4l2, and gtk-doc
                 self.use_system_libs = True
                 self.configure_options += ' --enable-gtk-doc'
